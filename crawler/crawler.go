@@ -2,12 +2,12 @@ package crawler
 
 import (
 	"crypto/tls"
-	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"song-chords-crawler/crawler/crawlerFactory"
 	"song-chords-crawler/repository/linkRepo"
-
-	"github.com/PuerkitoBio/goquery"
+	"song-chords-crawler/repository/songRepo"
 )
 
 var (
@@ -28,10 +28,11 @@ var (
 
 func Crawl(host string) {
 	songUrls := linkRepo.GetLinkRepo(host).GetSongUrls()
-	log.Println(len(songUrls))
+
+	crawlerFactory := crawlerFactory.GetCrawlerFactory(host)
 	for _, url := range songUrls {
 		log.Println(url.Url)
-		res, err := netClient.Get(url.Url)
+		res, err := netClient.Get("https://hopamviet.vn/chord/song/nhan-toi-khoang-troi-em/W8IU77F6.html")
 
 		if err != nil {
 			log.Fatal(err)
@@ -43,18 +44,9 @@ func Crawl(host string) {
 			log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
 		}
 
-		// Load the HTML document
-		doc, err := goquery.NewDocumentFromReader(res.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Find the review items
-		doc.Find("h1").Each(func(i int, s *goquery.Selection) {
-			// For each item found, get the title
-			title := s.Text()
-			fmt.Printf("Review %d: %s\n", i, title)
-		})
+		song := crawlerFactory.CrawlSong(res)
+		songRepo.StoreSong(song)
+		os.Exit(1)
 	}
 
 }

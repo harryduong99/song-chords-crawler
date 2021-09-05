@@ -2,6 +2,7 @@ package config
 
 const (
 	DB_NAME   = "song_chords"
-	COL_LINKS = "links_develop"
+	COL_LINKS = "links"
+	COL_SONGS = "song_chords"
 	HOPAMVIET = "https://hopamviet.vn"
 )
