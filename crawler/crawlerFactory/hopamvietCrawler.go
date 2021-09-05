@@ -3,7 +3,6 @@ package crawlerFactory
 import (
 	"log"
 	"net/http"
-	"os"
 	"song-chords-crawler/models"
 
 	"github.com/PuerkitoBio/goquery"
@@ -20,12 +19,18 @@ func (havCrawler *HavCrawler) CrawlSong(res *http.Response) models.Song {
 
 	var song models.Song
 	song.Title = doc.Find("h1").Text()
-	log.Println(doc.Find("#lyric").Html())
-	os.Exit(1)
+	song.Content, err = doc.Find("#lyric").Html()
+	if err != nil {
+		log.Printf("Get content failed!")
+	}
+
+	song.Author = doc.Find(".fa-leaf").Next().Text()
+	song.Category = doc.Find(".fa-book").Next().Text()
+
 	// Find the review items
-	doc.Find("#lyric").Each(func(i int, s *goquery.Selection) {
-		song.Content, err = s.Html()
-	})
+	// doc.Find("#lyric").Each(func(i int, s *goquery.Selection) {
+	// 	song.Content, err = s.Html()
+	// })
 
 	return song
 }

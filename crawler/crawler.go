@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
-	"os"
 	"song-chords-crawler/crawler/crawlerFactory"
 	"song-chords-crawler/repository/linkRepo"
 	"song-chords-crawler/repository/songRepo"
@@ -30,9 +29,11 @@ func Crawl(host string) {
 	songUrls := linkRepo.GetLinkRepo(host).GetSongUrls()
 
 	crawlerFactory := crawlerFactory.GetCrawlerFactory(host)
-	for _, url := range songUrls {
+	for i, url := range songUrls {
+		log.Println(i)
 		log.Println(url.Url)
-		res, err := netClient.Get("https://hopamviet.vn/chord/song/nhan-toi-khoang-troi-em/W8IU77F6.html")
+
+		res, err := netClient.Get(url.Url)
 
 		if err != nil {
 			log.Fatal(err)
@@ -45,8 +46,11 @@ func Crawl(host string) {
 		}
 
 		song := crawlerFactory.CrawlSong(res)
-		songRepo.StoreSong(song)
-		os.Exit(1)
+		result := songRepo.StoreSong(song)
+		if result {
+			url.Crawled = true
+			linkRepo.UpdateLink(url.ID, url)
+		}
 	}
 
 }

@@ -16,7 +16,7 @@ type HavLinkRepo struct{}
 func (linkRepo *HavLinkRepo) GetSongUrls() []models.Link {
 	var links []models.Link
 	collection := databaseDriver.Mongo.ConnectCollection(config.DB_NAME, config.COL_LINKS)
-	filter := bson.D{{"url", primitive.Regex{Pattern: "/chord/song/", Options: ""}}}
+	filter := bson.D{{"url", primitive.Regex{Pattern: "/chord/song/", Options: ""}}, {"crawled", false}}
 
 	cur, err := collection.Find(context.TODO(), filter)
 
