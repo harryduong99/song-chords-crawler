@@ -35,7 +35,6 @@ func UpdateLink(objID primitive.ObjectID, link models.Link) bool {
 		filter,
 		update,
 	)
-	log.Printf("adsf")
 	log.Println(rs)
 	return err == nil
 
